@@ -15,7 +15,6 @@ func ConnectGORM(dsn string) *gorm.DB {
 		return nil
 	}
 
-	// Проверим подключение
 	sqlDB, err := db.DB()
 	if err != nil {
 		logger.SugaredLogger.Errorf("Couldn't get sql.DB: %v", err)
