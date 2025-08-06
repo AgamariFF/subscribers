@@ -1,0 +1,324 @@
+definitions:
+  models.CreateSubscriptionRequest:
+    properties:
+      end_date:
+        description: |-
+          Дата окончания подписки (формат: 2006-01 или 01-2006)
+          required: false
+        type: string
+      price:
+        description: |-
+          Цена подписки (мин 0)
+          required: true
+        minimum: 0
+        type: integer
+      service_name:
+        description: |-
+          Название сервиса
+          required: true
+        type: string
+      start_date:
+        description: |-
+          Дата начала подписки (формат: 2006-01 или 01-2006)
+          required: true
+        type: string
+      user_id:
+        description: |-
+          ID пользователя в формате UUID
+          required: true
+        type: string
+    required:
+    - price
+    - service_name
+    - start_date
+    - user_id
+    type: object
+  models.SubscriptionSwagger:
+    properties:
+      ended_at:
+        example: 06-2024
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      monthly_price:
+        example: 1000
+        type: integer
+      service_name:
+        example: Netflix
+        type: string
+      started_at:
+        example: 01-2024
+        type: string
+      user_id:
+        example: 123e4567-e89b-12d3-a456-426614174001
+        type: string
+    type: object
+  models.UpdateSubscriptionRequest:
+    properties:
+      end_date:
+        description: 'Дата окончания подписки (формат: 01-2006)'
+        type: string
+      price:
+        description: Цена подписки
+        type: integer
+      service_name:
+        description: Название сервиса
+        type: string
+      start_date:
+        description: 'Дата начала подписки (формат: 01-2006)'
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для управления подписками
+  title: Subscriptions API
+  version: "1.0"
+paths:
+  /createSubscription:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новую подписку пользователя на сервис. Возвращает 409
+        при дублировании.
+      parameters:
+      - description: Данные для создания подписки
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Подписка успешно создана
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверные данные запроса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Подписка уже существует
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создаёт новую подписку
+      tags:
+      - subscription
+  /subscriptions:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID пользователя (UUID)
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SubscriptionSwagger'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить список подписок по user_id
+      tags:
+      - subscription
+  /subscriptions/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID подписки (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить подписку по ID
+      tags:
+      - subscription
+    get:
+      parameters:
+      - description: ID подписки (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SubscriptionSwagger'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить одну подписку по ID
+      tags:
+      - subscription
+    patch:
+      consumes:
+      - application/json
+      description: Для удаления даты окончания подписки необходимо передать пустую
+        строку в поле `ended_at`.
+      parameters:
+      - description: ID подписки (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные для обновления
+        in: body
+        name: subscription
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновить подписку
+      tags:
+      - subscription
+  /subscriptions/total:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID пользователя (UUID)
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: Название подписки (фильтр)
+        in: query
+        name: service_name
+        type: string
+      - description: 'Начало периода (формат: 01-2006)'
+        in: query
+        name: start_date
+        type: string
+      - description: 'Конец периода (формат: 01-2006)'
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Суммарная стоимость
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить суммарную стоимость подписок за период с фильтрацией
+      tags:
+      - subscription
+swagger: "2.0"
