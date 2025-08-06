@@ -10,7 +10,7 @@ cd subscribers
 2. Запуск контейнера:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 3. API будет доступно по адресу:
