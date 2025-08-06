@@ -1,3 +1,5 @@
+## Как запустить программу
+
 1. Клонируй репозиторий:
 
 ```bash
@@ -5,7 +7,7 @@ git clone https://github.com/AgamariFF/subscribers.git
 cd subscribers
 ```
 
-2. Построй и запусти контейнер:
+2. Запуск контейнера:
 
 ```bash
 docker-compose up --build
